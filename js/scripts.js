@@ -3,13 +3,14 @@ function Contact(first, last, favColor, favAnimal, address) {
   this.lastName = last;
   this.favColor = favColor;
   this.favAnimal = favAnimal;
-  this.addresses = []
+  this.addresses = [];
 };
 
-function Address(street, city, state) {
+function Address(street, city, state, type) {
   this.street = street;
   this.city = city;
   this.state = state;
+  this.type = type;
 };
 
 Contact.prototype.fullName = function() {
@@ -17,10 +18,10 @@ Contact.prototype.fullName = function() {
 };
 
 Address.prototype.fullAddress = function() {
-  return this.street + ", " + this.city + ", " + this.state;
+  return this.type + ": " + this.street + ", " + this.city + ", " + this.state;
 }
 
-function resetFields() {
+var resetFields = function() {
   $("input#new-first-name").val("");
   $("input#new-last-name").val("");
   $("input#new-favorite-color").val("");
@@ -34,20 +35,27 @@ $(document).ready(function() {
 
   $("#add-address").click(function() {
     $("#new-addresses").append('<div class="new-address">' +
-      '<div class="form-group">' +
-      '<label for="new-street">Street</label>' +
-      '<input type="text" class="form-control new-street">' +
-      '</div>' +
-      '<div class="form-group">' +
-      '<label for="new-city">City</label>' +
-      '<input type="text" class="form-control new-city">' +
-      '</div>' +
-      '<div class="form-group">' +
-      '<label for="new-state">State</label>' +
-      '<input type="text" class="form-control new-state">' +
-      '</div>' +
-      '</div>')
-  });
+                                  '<div class="form-group">' +
+                                    '<label for="new-street">Street</label>' +
+                                    '<input type="text" class="form-control new-street">' +
+                                  '</div>' +
+                                  '<div class="form-group">' +
+                                    '<label for="new-city">City</label>' +
+                                    '<input type="text" class="form-control new-city">' +
+                                  '</div>' +
+                                  '<div class="form-group">' +
+                                    '<label for="new-state">State</label>' +
+                                    '<input type="text" class="form-control new-state">' +
+                                  '</div>' +
+                                '</div>' +
+                                '<label for="address-type">Address Type</label>' +
+                                '<select class="form-control" class="address-type">' +
+                                  '<option value="home">Home</option>' +
+                                  '<option value="yacht">Yacht</option>' +
+                                  "<option value='accountant'>Accountant's</option>" +
+                                  "<option value='lover'>Lover's pad</option>" +
+                                '</select>')
+    });
   $("form#new-contact").submit(function(event) {
     event.preventDefault();
 
@@ -62,7 +70,9 @@ $(document).ready(function() {
       var inputtedStreet = $(this).find("input.new-street").val();
       var inputtedCity = $(this).find("input.new-city").val();
       var inputtedState = $(this).find("input.new-state").val();
-      var newAddress = new Address(inputtedStreet, inputtedCity, inputtedState);
+
+      var inputtedType = $(this).find("#address-type").val();
+      var newAddress = new Address(inputtedStreet, inputtedCity, inputtedState, inputtedType);
       newContact.addresses.push(newAddress);
     });
 
@@ -70,14 +80,12 @@ $(document).ready(function() {
 
     $(".contact").last().click(function() {
       $("#show-contact").show();
-      $("#show-contact h2").text(newContact.firstName);
-      $(".first-name").text(newContact.firstName);
-      $(".last-name").text(newContact.lastName);
+      $("#show-contact h2").text(newContact.fullName());
       $(".favorite-color").text(newContact.favColor);
       $(".favorite-animal").text(newContact.favAnimal);
       $("ul#addresses").text("");
       newContact.addresses.forEach(function(address) {
-        $("ul#addresses").append("<li>" + address.fullAddress + "</li>");
+        $("ul#addresses").append("<li>" + address.fullAddress() + "</li>");
       });
 
     });
